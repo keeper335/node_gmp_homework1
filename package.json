@@ -1,0 +1,20 @@
+{
+  "name": "homework1",
+  "version": "1.0.0",
+  "description": "no",
+  "main": "index.js",
+  "scripts": {
+    "task1": "node task1",
+    "task2": "node task2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keeper335/node_gmp_homework1.git"
+  },
+  "author": "Aleksey",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/keeper335/node_gmp_homework1/issues"
+  },
+  "homepage": "https://github.com/keeper335/node_gmp_homework1#readme"
+}
