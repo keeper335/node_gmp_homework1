@@ -66,4 +66,4 @@ async function processCsvStream(inputPath, outputPath) {
     )
 }
 
-const processCsv = (USE_RAM)? processCsvRAM : processCsvStream;
+const processCsv = (USE_RAM)? processCsvRAM : processCsvStream
