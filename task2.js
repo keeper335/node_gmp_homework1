@@ -44,7 +44,7 @@ async function processCsvRAM(inputPath, outputPath) {
         .subscribe((json) => {
             resp_json.push(JSON.stringify(json))
         },
-        (error) => reject(error),
+        (error) => rjct(error),
         () => fs.writeFile(outputPath, resp_json.join('\r\n'), (err) => {
             if (err) rjct(err)
             else rslv()
