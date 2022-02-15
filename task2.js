@@ -2,7 +2,7 @@
 const USE_RAM = process.env.USE_RAM == 1 || false // use implementation to load files into RAM or STREAMS (stream by default)
 console.debug(`You're about to run ${USE_RAM ? 'full RAM' : 'stream'} implementation`)
 
-const csv2json = require('node-csvtojson'),
+const csv2json = require('csvtojson'),
     { readdir, stat } = require('fs/promises'),
     { basename, extname, resolve } = require('path'),
     fs = require('fs');

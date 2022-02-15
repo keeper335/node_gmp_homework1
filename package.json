@@ -12,7 +12,7 @@
     "url": "git+https://github.com/keeper335/node_gmp_homework1.git"
   },
   "dependencies": {
-    "node-csvtojson": "git://github.com/Keyang/node-csvtojson"
+    "csvtojson": "~2.0.10"
   },
   "author": "Aleksey",
   "license": "ISC",
