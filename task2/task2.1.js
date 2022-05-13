@@ -153,7 +153,6 @@ app.put('/api/user/:id', function(req, res) {
 
 app.delete('/api/user/:id', function(req, res) {
     try {
-        console.log(req.query.soft);
         const softRemove = req.query.soft === "false" ? false : true;
         users_db.delete(req.params.id, softRemove);
         res.end('User deleted');
