@@ -26,17 +26,22 @@ class Users {
         this.users = [];
     }
 
-    get(id) {
+    find(id) {
         return id && this.users.find(u => u.id === id);
     }
 
-    getNotDeleted(id) {
-        const user = this.get(id);
-        return user && user.isDeleted !== true ? user : undefined;
+    get(id) {
+        const user = this.find(id);
+        if (user && user.isDeleted !== true) {
+            const retUser = { ...user };
+            delete retUser.isDeleted;
+            return retUser;
+        }
+        return null;
     }
 
     create({id, login, password, age}) {
-        if (this.get(id)) {
+        if (this.find(id)) {
             throw new Error(`Cannot create - user id ${id} already exists`);
         }
 
@@ -49,8 +54,8 @@ class Users {
     }
 
     update({id, login, password, age}) {
-        const user = this.getNotDeleted(id);
-        if (!user) {
+        const user = this.find(id);
+        if (!user || user.isDeleted === true) {
             throw new Error(`Cannot update - user id ${id} does not exists or removed`);
         }
 
@@ -60,7 +65,7 @@ class Users {
     }
 
     delete(id, soft = true) {
-        const user = this.get(id);
+        const user = this.find(id);
         if (!user) {
             throw new Error(`Cannot remove - user id ${id} does not exists`);
         }
@@ -72,22 +77,30 @@ class Users {
     }
 
     getAutoSuggestUsers(loginSubstring, limit = 0) {
-        const ret_users = this.users
-            .filter(u => !u.isDeleted && u.login && u.login.includes(loginSubstring))
+        const retUsers = this.getAll()
+            .filter(u => u.login && u.login.includes(loginSubstring))
             .sort((u1, u2) => u1.login > u2.login ? 1 :
                             u1.login < u2.login ? -1 : 0);
-        return limit > 0 ? ret_users.slice(0, limit) : ret_users;
+        return limit > 0 ? retUsers.slice(0, limit) : retUsers;
     }
 
-    getAllUsers() {
-        return this.users;
+    getAll() {
+        console.log(this.users); // for debug 
+        return this.users.reduce((prev, curr) => {
+            if (curr.isDeleted !== true) {
+                const retUser = { ...curr };
+                delete retUser.isDeleted;
+                prev.push(retUser);
+            }
+            return prev;
+        }, []);
     }
 }
 
 const users_db = new Users();
 
 app.get('/api/user', function(_req, res) {
-    res.json({users: users_db.getAllUsers()});
+    res.json({users: users_db.getAll()});
 });
 
 const querySchema = joi.object({
@@ -102,7 +115,7 @@ app.get('/api/user/auto-suggest', validator.query(querySchema), function(req, re
 
 app.get('/api/user/:id', function(req, res) {
     try {
-        const user = users_db.getNotDeleted(req.params.id);
+        const user = users_db.get(req.params.id);
         if (user) {
             res.json({user});
         } else {

@@ -10,12 +10,12 @@ app.use(function(req, _res, next) {
 });
 
 class User {
-    constructor(id, login, password, age, isDeleted = false) {
+    constructor(id, login, password, age) {
         this.id = id ?? get_uuid();
         this.login = login;
         this.password = password;
         this.age = age;
-        this.isDeleted = isDeleted;
+        this.isDeleted = false;
     }
 }
 
@@ -24,17 +24,22 @@ class Users {
         this.users = [];
     }
 
-    get(id) {
+    find(id) {
         return id && this.users.find(u => u.id === id);
     }
 
-    getNotDeleted(id) {
-        const user = this.get(id);
-        return user && user.isDeleted !== true ? user : undefined;
+    get(id) {
+        const user = this.find(id);
+        if (user && user.isDeleted !== true) {
+            const retUser = { ...user };
+            delete retUser.isDeleted;
+            return retUser;
+        }
+        return null;
     }
 
     create({id, login, password, age}) {
-        if (this.get(id)) {
+        if (this.find(id)) {
             throw new Error(`Cannot create - user id ${id} already exists`);
         }
 
@@ -47,8 +52,8 @@ class Users {
     }
 
     update({id, login, password, age}) {
-        const user = this.getNotDeleted(id);
-        if (!user) {
+        const user = this.find(id);
+        if (!user || user.isDeleted === true) {
             throw new Error(`Cannot update - user id ${id} does not exists or removed`);
         }
 
@@ -58,7 +63,7 @@ class Users {
     }
 
     delete(id, soft = true) {
-        const user = this.get(id);
+        const user = this.find(id);
         if (!user) {
             throw new Error(`Cannot remove - user id ${id} does not exists`);
         }
@@ -70,50 +75,52 @@ class Users {
     }
 
     getAutoSuggestUsers(loginSubstring, limit = 0) {
-        return this.users
-            .filter(u => !u.isDeleted && u.login && u.login.includes(loginSubstring))
+        const retUsers = this.getAll()
+            .filter(u => u.login && u.login.includes(loginSubstring))
             .sort((u1, u2) => u1.login > u2.login ? 1 :
-                            u1.login < u2.login ? -1 : 0)
-            .slice(0, limit);
+                            u1.login < u2.login ? -1 : 0);
+        return limit > 0 ? retUsers.slice(0, limit) : retUsers;
     }
 
-    getAllUsers() {
-        return this.users;
+    getAll() {
+        console.log(this.users); // for debug 
+        return this.users.reduce((prev, curr) => {
+            if (curr.isDeleted !== true) {
+                const retUser = { ...curr };
+                delete retUser.isDeleted;
+                prev.push(retUser);
+            }
+            return prev;
+        }, []);
     }
 }
 
 const users_db = new Users();
 
 app.get('/api/user', function(_req, res) {
-    res.json({users: users_db.getAllUsers()});
+    res.json({users: users_db.getAll()});
 });
 
-function verifyQueries(params, req, res, next) {
-    let errMsg = '';
-    if (req && req.query) {
+function verifyQueries(params) {
+    return (req, res, next) => {
         for (let param of params) {
             if (!req.query[param]) {
-                errMsg = `Missing ${param} query`;
-                res.status(400);
-                res.send(errMsg);
+                res.status(400).send(`Missing ${param} query`);
                 return;
             }
         }
         next();
-    } else {
-        res.status(400);
-        res.send('Missing query parameters');
     }
 }
 
-app.get('/api/user/auto-suggest', verifyQueries.bind(this, ['limit', 'login']), function(req, res) {
+app.get('/api/user/auto-suggest', verifyQueries(['limit', 'login']), function(req, res) {
     const users_limit = users_db.getAutoSuggestUsers(req.query.login, req.query.limit);
     res.json({users: users_limit});
 });
 
 app.get('/api/user/:id', function(req, res) {
     try {
-        const user = users_db.getNotDeleted(req.params.id);
+        const user = users_db.get(req.params.id);
         if (user) {
             res.json({user});
         } else {
