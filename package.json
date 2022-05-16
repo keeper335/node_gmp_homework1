@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "description": "no",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "task1.1": "node task1.1",
     "task1.2": "node task1.2",
     "task2.1": "node task2/task2.1",
-    "task2.2": "node task2/task2.2"
+    "task2.2": "node task2/task2.2",
+    "task3": "node task3/app"
   },
   "repository": {
     "type": "git",
