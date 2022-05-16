@@ -1,0 +1,103 @@
+{
+	"info": {
+		"_postman_id": "ecb04f9c-c0fa-4035-8cfa-1f35ee3a79f2",
+		"name": "Test task 2.1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "get users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3000/api/user"
+			},
+			"response": []
+		},
+		{
+			"name": "get user id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:3000/api/user/42b9ec28-4e14-4dc6-b5b9-a280e27d58d5"
+			},
+			"response": []
+		},
+		{
+			"name": "get user suggest",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/user/auto-suggest?limit=2&login=add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"user",
+						"auto-suggest"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "2"
+						},
+						{
+							"key": "login",
+							"value": "add"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create_user1",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"login\": \"akanaev\", \"password\": \"123ewq\", \"age\": 36}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/api/user"
+			},
+			"response": []
+		},
+		{
+			"name": "update_user1",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"login\": \"afkanaev\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:3000/api/user/96d5a1b8-6603-41a2-81f0-20fd36978e1c"
+			},
+			"response": []
+		},
+		{
+			"name": "delete_user1",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:3000/api/user/96b5a1b8-6603-41a2-81f0-20fd36978e1c"
+			},
+			"response": []
+		}
+	]
+}
